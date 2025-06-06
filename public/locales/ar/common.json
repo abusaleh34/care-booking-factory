@@ -107,7 +107,13 @@
     "sortBy": "ترتيب حسب",
     "nearMe": "بالقرب مني",
     "distance": "المسافة",
-    "searchResults": "نتائج البحث"
+    "searchResults": "نتائج البحث",
+    "andAbove": "وما فوق",
+    "tryDifferentSearch": "جرب مصطلحات بحث أو تصفية مختلفة",
+    "resultsCount": "تم العثور على {{count}} نتيجة",
+    "sortByRating": "أعلى تقييم",
+    "sortByReviews": "الأكثر تقييمات",
+    "sortByName": "الاسم (أ-ي)"
   },
   "booking": {
     "selectDate": "اختر التاريخ",

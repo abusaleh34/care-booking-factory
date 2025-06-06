@@ -107,7 +107,13 @@
     "sortBy": "Sort by",
     "nearMe": "Near me",
     "distance": "Distance",
-    "searchResults": "Search Results"
+    "searchResults": "Search Results",
+    "andAbove": "and above",
+    "tryDifferentSearch": "Try different search terms or filters",
+    "resultsCount": "{{count}} results found",
+    "sortByRating": "Highest Rating",
+    "sortByReviews": "Most Reviews",
+    "sortByName": "Name (A-Z)"
   },
   "booking": {
     "selectDate": "Select Date",
