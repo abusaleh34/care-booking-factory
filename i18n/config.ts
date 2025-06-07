@@ -1,5 +1,4 @@
 import { InitOptions } from 'i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 // Define supported languages
 export const languages = ['en', 'ar'] as const;
@@ -27,7 +26,7 @@ export const languageDirections: Record<Language, 'ltr' | 'rtl'> = {
   ar: 'rtl',
 };
 
-// i18next configuration
+// i18next configuration (client-side safe parts)
 export const i18nConfig: InitOptions = {
   defaultNS: 'common',
   fallbackNS: 'common',
@@ -38,8 +37,9 @@ export const i18nConfig: InitOptions = {
     escapeValue: false, // React already does escaping
   },
   react: {
-    useSuspense: false,
+    useSuspense: false, // Set to false as per existing config, can be true for Next.js 13+ App Router if using Suspense
   },
+  // Detection options are client-side specific and fine here
   detection: {
     order: ['path', 'cookie', 'navigator', 'localStorage', 'htmlTag'],
     lookupCookie: 'NEXT_LOCALE',
@@ -48,14 +48,6 @@ export const i18nConfig: InitOptions = {
     cookieExpirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
   },
 };
-
-// Helper function to get translations for server-side rendering
-export async function getI18nProps(locale: string, ns: Namespace[] = ['common']) {
-  const resolvedLocale = languages.includes(locale as Language) ? locale : defaultLanguage;
-  return {
-    ...(await serverSideTranslations(resolvedLocale, ns as string[])),
-  };
-}
 
 // Helper function to get language direction
 export function getLanguageDirection(language: string): 'ltr' | 'rtl' {
