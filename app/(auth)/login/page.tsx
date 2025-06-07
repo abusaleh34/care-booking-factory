@@ -141,7 +141,7 @@ export default function LoginPage() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage>{msg => t(msg.message as string)}</FormMessage>
+                <FormMessage>{(msg: { message: string }) => t(msg.message)}</FormMessage>
               </FormItem>
             )}
           />
@@ -168,7 +168,7 @@ export default function LoginPage() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage>{msg => t(msg.message as string)}</FormMessage>
+                <FormMessage>{(msg: { message: string }) => t(msg.message)}</FormMessage>
               </FormItem>
             )}
           />
