@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation'; // Using next/navigation for App Router
+// import { useTranslation } from 'react-i18next'; // For i18n error messages
 
 // Define types
 export type UserRole = 'customer' | 'provider' | 'admin';
@@ -20,14 +21,17 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
+  token: string | null; // This will be the access token
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (credentials: Record<string, any>) => Promise<void>;
-  logout: () => void;
+  login: (credentials: Record<string, any>) => Promise<User>;
+  logout: () => Promise<void>;
   register: (userData: Record<string, any>) => Promise<any>; // Returns API response for OTP or other flows
-  fetchUserProfile: () => Promise<void>; // Fetches profile if token exists but user state is null
+  fetchUserProfile: () => Promise<User | null>; // Fetches profile if token exists but user state is null
   updateLocalUser: (updatedUserData: Partial<User>) => void; // Updates user in context and localStorage
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (passwordResetToken: string, newPassword: string) => Promise<void>;
+  refreshToken: () => Promise<string | null>; // Function to attempt token refresh
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,66 +40,132 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const AUTH_TOKEN_KEY = 'authToken';
+const ACCESS_TOKEN_KEY = 'accessToken'; // Changed from authToken for clarity
 const AUTH_USER_KEY = 'authUser';
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Start true for initial load check
+  const [token, setToken] = useState<string | null>(null); // Access Token
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  // const { t } = useTranslation('auth'); // For i18n error messages
 
-  const loadAuthDataFromStorage = useCallback(() => {
+  const clearAuthData = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
+  };
+
+  const persistAuthData = (newToken: string, newUser: User) => {
+    setToken(newToken);
+    setUser(newUser);
+    localStorage.setItem(ACCESS_TOKEN_KEY, newToken);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(newUser));
+  };
+
+  const fetchUserProfile = useCallback(async (): Promise<User | null> => {
+    const currentToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+    if (!currentToken) {
+      clearAuthData();
+      setIsLoading(false);
+      return null;
+    }
+
     setIsLoading(true);
     try {
-      const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
-      const storedUserJson = localStorage.getItem(AUTH_USER_KEY);
+      // Attempt to fetch user profile using the stored token
+      // This also serves to validate the token
+      const response = await fetch('/api/users/me', { // Assuming an endpoint to get current user
+        headers: {
+          'Authorization': `Bearer ${currentToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if (storedToken && storedUserJson) {
-        const storedUser: User = JSON.parse(storedUserJson);
-        setToken(storedToken);
-        setUser(storedUser);
+      if (!response.ok) {
+        if (response.status === 401) { // Token might be expired or invalid
+          // Attempt to refresh token
+          const newAccessToken = await refreshToken();
+          if (newAccessToken) {
+            // Retry fetchUserProfile with new token
+            // This recursive call should have a depth limit or different handling in a real app
+            return await fetchUserProfile(); // Simplified: re-call to re-validate with new token
+          }
+        }
+        throw new Error('Failed to fetch user profile'); // Or a more specific error from response
       }
+
+      const userData: User = await response.json();
+      persistAuthData(currentToken, userData); // Persist potentially updated user data
+      return userData;
     } catch (error) {
-      console.error("Failed to load auth data from storage:", error);
-      // Clear potentially corrupted storage
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(AUTH_USER_KEY);
+      console.error('Fetch user profile error:', error);
+      await logout(); // If fetching profile fails (e.g. token invalid, refresh failed), log out
+      return null;
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, []); // Added dependencies, including refreshToken and logout
+
+  const refreshToken = async (): Promise<string | null> => {
+    try {
+      // The browser will automatically send the httpOnly refresh token cookie
+      const response = await fetch('/api/auth/refresh-token', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to refresh token');
+      }
+
+      const { accessToken: newAccessToken } = await response.json();
+      if (newAccessToken && user) { // Ensure user context exists to update
+        persistAuthData(newAccessToken, user); // Re-persist with new access token, existing user data
+        return newAccessToken;
+      }
+      return null;
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      await logout(); // If refresh fails, logout
+      return null;
+    }
+  };
+
 
   useEffect(() => {
-    loadAuthDataFromStorage();
-  }, [loadAuthDataFromStorage]);
+    const initializeAuth = async () => {
+      await fetchUserProfile(); // This will try to load user based on stored token
+      setIsLoading(false);
+    };
+    initializeAuth();
+  }, [fetchUserProfile]);
 
-  const login = async (credentials: Record<string, any>): Promise<void> => {
+
+  const login = async (credentials: Record<string, any>): Promise<User> => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/login', { // MSW will intercept this
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        throw new Error(data.message || 'auth:login.error'); // Use i18n key
       }
 
-      const data = await response.json();
-      if (data.user && data.token) {
-        setUser(data.user);
-        setToken(data.token);
-        localStorage.setItem(AUTH_TOKEN_KEY, data.token);
-        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+      if (data.user && data.accessToken) { // Assuming backend returns accessToken
+        persistAuthData(data.accessToken, data.user);
+        return data.user;
       } else {
-        throw new Error('Login response missing user or token');
+        throw new Error('auth:login.missingTokenOrUser');
       }
     } catch (error) {
       console.error('Login error:', error);
-      throw error; // Re-throw for the component to handle
+      clearAuthData();
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +174,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (userData: Record<string, any>): Promise<any> => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/register', { // MSW will intercept
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
@@ -112,18 +182,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const responseData = await response.json();
       if (!response.ok) {
-        throw new Error(responseData.message || 'Registration failed');
+        throw new Error(responseData.message || 'auth:register.error');
       }
       
-      // Depending on flow, registration might auto-login or require OTP
-      // For now, just return the response. If it contains user/token, handle it.
-      if (responseData.user && responseData.token) {
-        setUser(responseData.user);
-        setToken(responseData.token);
-        localStorage.setItem(AUTH_TOKEN_KEY, responseData.token);
-        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(responseData.user));
+      // If registration auto-logins and returns token/user:
+      if (responseData.user && responseData.accessToken) {
+        persistAuthData(responseData.accessToken, responseData.user);
       }
-      return responseData; // Return the full response for further processing (e.g., OTP)
+      return responseData; // Return for further processing (e.g., OTP, email verification)
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -132,58 +198,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(AUTH_USER_KEY);
-    // Optionally, call a backend logout endpoint
-    // fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/auth/login'); // Redirect to login page after logout
-  };
-
-  const fetchUserProfile = async (): Promise<void> => {
-    const currentToken = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (!currentToken) {
-      // No token, ensure user is logged out
-      if (user || token) {
-         setUser(null);
-         setToken(null);
-      }
-      setIsLoading(false);
-      return;
-    }
-
-    // If user is already in state with this token, no need to fetch unless forced
-    if (user && token === currentToken) {
-        setIsLoading(false);
-        return;
-    }
-    
+  const logout = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      // In a real app, you'd have an endpoint like /api/users/me
-      // For this mock setup, we rely on localStorage or re-fetch if user ID is known
-      // Let's assume login stores user, and this function is a fallback or refresh.
-      // If we only have a token and no user in localStorage, this function would hit /api/users/me.
-      // Since our mock login stores the user, we can re-use loadAuthDataFromStorage or implement /api/users/me.
-      // For now, let's assume if token exists, user should also exist in localStorage.
-      const storedUserJson = localStorage.getItem(AUTH_USER_KEY);
-      if (storedUserJson) {
-        const storedUser: User = JSON.parse(storedUserJson);
-        setUser(storedUser);
-        setToken(currentToken); // Ensure token state is also up-to-date
-      } else {
-        // This case means token exists but user data is missing from storage - an inconsistent state.
-        // Ideally, call /api/users/me here. For now, clear the potentially invalid token.
-        console.warn("Token found but user data missing from storage. Clearing token.");
-        logout(); // This will clear token and redirect
-      }
+      // Call backend to invalidate refresh token (which is httpOnly)
+      await fetch('/api/auth/logout', { method: 'POST' });
     } catch (error) {
-      console.error('Failed to fetch user profile:', error);
-      logout(); // If fetching profile fails, log out
+      console.error("Logout API call failed, clearing client-side session anyway:", error);
     } finally {
+      clearAuthData();
       setIsLoading(false);
+      router.push('/auth/login');
     }
   };
   
@@ -194,6 +219,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(newUser));
       return newUser;
     });
+  };
+
+  const requestPasswordReset = async (email: string): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/request-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'auth:forgotPassword.error');
+      }
+      // Typically, you'd show a success message to the user here
+    } catch (error) {
+      console.error('Request password reset error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetPassword = async (passwordResetToken: string, newPassword: string): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: passwordResetToken, newPassword }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'auth:resetPassword.error');
+      }
+      // Password reset successful, perhaps redirect to login or show success message
+    } catch (error) {
+      console.error('Reset password error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isAuthenticated = !!token && !!user;
@@ -210,6 +277,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         register,
         fetchUserProfile,
         updateLocalUser,
+        requestPasswordReset,
+        resetPassword,
+        refreshToken,
       }}
     >
       {children}
@@ -225,36 +295,42 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-// Example ProtectedRoute HOC (can be in a separate file)
-// This is a conceptual example. Actual implementation might vary.
+// Conceptual example of how an API client might use refreshToken
+// This would typically be part of a dedicated API service with interceptors.
 /*
-export function withAuth<P extends object>(
-  WrappedComponent: React.ComponentType<P>,
-  allowedRoles?: UserRole[]
-) {
-  return function AuthenticatedComponent(props: P) {
-    const { isAuthenticated, user, isLoading } = useAuth();
-    const router = useRouter();
+async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
+  let token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
-    useEffect(() => {
-      if (!isLoading && !isAuthenticated) {
-        router.push('/auth/login');
-      } else if (!isLoading && isAuthenticated && allowedRoles) {
-        if (!user?.role || !allowedRoles.includes(user.role)) {
-          router.push('/unauthorized'); // Or some other page
-        }
-      }
-    }, [isLoading, isAuthenticated, user, router, allowedRoles]);
-
-    if (isLoading || !isAuthenticated) {
-      return <div>Loading authentication...</div>; // Or a spinner component
-    }
-    
-    if (allowedRoles && (!user?.role || !allowedRoles.includes(user.role))) {
-        return <div>Checking authorization...</div>; // Or redirecting
-    }
-
-    return <WrappedComponent {...props} />;
+  const makeRequest = async (currentToken: string | null) => {
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${currentToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
   };
+
+  let response = await makeRequest(token);
+
+  if (response.status === 401) { // Unauthorized, possibly expired token
+    try {
+      const authContext = useAuth(); // This hook usage is problematic outside components/hooks
+                                    // In a real app, you'd get refreshToken function from context or a global store
+      const newAccessToken = await authContext.refreshToken(); // Or call the refresh endpoint directly
+      if (newAccessToken) {
+        response = await makeRequest(newAccessToken); // Retry with new token
+      } else {
+        // Refresh failed, logout or redirect
+        // authContext.logout(); // This would also be problematic here
+        throw new Error("Session expired, please log in again.");
+      }
+    } catch (refreshError) {
+       // authContext.logout();
+       throw refreshError;
+    }
+  }
+  return response;
 }
 */

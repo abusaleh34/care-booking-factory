@@ -14,7 +14,9 @@
     "help": "Help & Support",
     "logout": "Logout",
     "back": "Back",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "backToHome": "Back to Home",
+    "backToSearch": "Back to Search"
   },
   "auth": {
     "login": "Login",
@@ -67,7 +69,10 @@
     "seeMore": "See More",
     "loadMore": "Load More",
     "addToFavorites": "Add to Favorites",
-    "removeFromFavorites": "Remove from Favorites"
+    "removeFromFavorites": "Remove from Favorites",
+    "refresh": "Refresh",
+    "viewAll": "View All",
+    "seeMoreReviews": "See More Reviews"
   },
   "status": {
     "available": "Available",
@@ -93,7 +98,20 @@
     "am": "AM",
     "pm": "PM",
     "dateFormat": "MM/DD/YYYY",
-    "timeFormat": "h:mm A"
+    "timeFormat": "h:mm A",
+    "at": "at",
+    "minutesShort": "min",
+    "day": "Day",
+    "closed": "Closed",
+    "daysFull": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    }
   },
   "search": {
     "placeholder": "Search for services or providers",
@@ -129,7 +147,70 @@
     "cancellationPolicy": "Cancellation Policy",
     "reschedule": "Reschedule",
     "duration": "Duration",
-    "price": "Price"
+    "price": "Price",
+    "customer": "Customer",
+    "service": "Service",
+    "date": "Date",
+    "time": "Time",
+    "status": "Status",
+    "dateTime": "Date & Time",
+    "totalPrice": "Total Price",
+    "customerNotesLabel": "Notes for the provider (optional)",
+    "customerNotesPlaceholder": "Any special requests or information...",
+    "notesTooLong": "Notes cannot exceed 500 characters.",
+    "confirmAndPay": "Confirm & Proceed to Payment",
+    "backToProvider": "Back to {{providerName}}'s Profile",
+    "selectServiceTitle": "Select a Service at {{providerName}}",
+    "selectServiceDescription": "Choose from the available services below to start your booking.",
+    "noServicesAvailable": "No services available for booking at this time.",
+    "selectDateTimeTitle": "Select Date & Time",
+    "selectDateTimeForService": "Choose a date and time for {{serviceName}}.",
+    "selectServiceFirst": "Please select a service first.",
+    "noSlotsAvailable": "No time slots available for the selected date.",
+    "selectDateToSeeTimes": "Please select a date to see available time slots.",
+    "confirmDetailsTitle": "Confirm Your Booking",
+    "confirmDetailsDescription": "Please review your booking details before proceeding.",
+    "steps": {
+      "service": "Select Service",
+      "dateTime": "Choose Date & Time",
+      "confirm": "Confirm Details",
+      "payment": "Payment",
+      "booked": "Booking Confirmed"
+    },
+    "payment": {
+      "title": "Secure Payment",
+      "description": "Please enter your payment details to complete the booking for {{amount}}.",
+      "cardHolderName": "Cardholder Name",
+      "cardHolderNamePlaceholder": "John Doe",
+      "cardNumber": "Card Number",
+      "expiryDate": "Expiry Date (MM/YY)",
+      "cvv": "CVV",
+      "invalidCard": "Invalid card number (must be 16 digits).",
+      "invalidExpiry": "Invalid expiry date (MM/YY format).",
+      "invalidCvv": "Invalid CVV (3 or 4 digits).",
+      "nameRequired": "Cardholder name is required.",
+      "mockNoticeTitle": "Mock Payment Notice",
+      "mockNoticeDescription": "This is a simulated payment. No real transaction will occur. You can use any dummy card details.",
+      "payNowButton": "Pay Now"
+    },
+    "confirmed": {
+      "title": "Booking Confirmed!",
+      "description": "Your appointment has been successfully scheduled.",
+      "bookingId": "Booking ID: {{id}}",
+      "emailConfirmation": "A confirmation email with your booking details has been sent to your address.",
+      "viewMyBookings": "View My Bookings"
+    },
+    "errors": {
+      "authRequiredTitle": "Authentication Required",
+      "authRequiredMessage": "You need to be logged in to make a booking. Please log in or create an account.",
+      "fetchProviderFailed": "Failed to load provider information. Please try again.",
+      "providerNotFound": "Provider not found.",
+      "selectDateServiceFirst": "Please select a service and date first.",
+      "fetchSlotsFailed": "Failed to load available time slots. Please try again.",
+      "createBookingFailed": "Failed to create your booking. Please try again.",
+      "missingInfoPayment": "Missing booking information. Please go back and complete all steps.",
+      "invalidStep": "Invalid booking step."
+    }
   },
   "provider": {
     "about": "About",
@@ -159,7 +240,22 @@
     "deleteService": "Delete Service",
     "setupProfile": "Setup Profile",
     "updateProfile": "Update Profile",
-    "viewProfile": "View Public Profile"
+    "viewProfile": "View Public Profile",
+    "welcomeMessage": "Welcome, {{name}}!",
+    "notVerified": "Not Verified",
+    "todayAppointments": "Today's Appointments",
+    "appointmentsForToday": "{{count}} appointments scheduled for today",
+    "noAppointmentsToday": "No appointments scheduled for today.",
+    "freeTimeMessage": "Enjoy your free time or prepare for upcoming bookings!",
+    "quickActions": "Quick Actions",
+    "manageYourBusiness": "Manage your business efficiently.",
+    "recentBookingsDescription": "Overview of your most recent bookings.",
+    "stats": {
+      "totalBookings": "Total Bookings",
+      "upcomingBookings": "Upcoming Bookings",
+      "totalRevenue": "Total Revenue",
+      "rating": "Average Rating"
+    }
   },
   "categories": {
     "hair": "Hair",

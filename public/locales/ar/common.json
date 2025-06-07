@@ -14,7 +14,9 @@
     "help": "المساعدة والدعم",
     "logout": "تسجيل الخروج",
     "back": "رجوع",
-    "dashboard": "لوحة التحكم"
+    "dashboard": "لوحة التحكم",
+    "backToHome": "العودة إلى الرئيسية",
+    "backToSearch": "العودة إلى البحث"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -67,7 +69,10 @@
     "seeMore": "عرض المزيد",
     "loadMore": "تحميل المزيد",
     "addToFavorites": "إضافة إلى المفضلة",
-    "removeFromFavorites": "إزالة من المفضلة"
+    "removeFromFavorites": "إزالة من المفضلة",
+    "refresh": "تحديث",
+    "viewAll": "عرض الكل",
+    "seeMoreReviews": "عرض المزيد من التقييمات"
   },
   "status": {
     "available": "متاح",
@@ -93,7 +98,20 @@
     "am": "صباحاً",
     "pm": "مساءً",
     "dateFormat": "DD/MM/YYYY",
-    "timeFormat": "h:mm A"
+    "timeFormat": "h:mm A",
+    "at": "في",
+    "minutesShort": "دقيقة",
+    "day": "اليوم",
+    "closed": "مغلق",
+    "daysFull": {
+      "sunday": "الأحد",
+      "monday": "الاثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة",
+      "saturday": "السبت"
+    }
   },
   "search": {
     "placeholder": "ابحث عن خدمات أو مقدمي خدمات",
@@ -129,7 +147,70 @@
     "cancellationPolicy": "سياسة الإلغاء",
     "reschedule": "إعادة جدولة",
     "duration": "المدة",
-    "price": "السعر"
+    "price": "السعر",
+    "customer": "العميل",
+    "service": "الخدمة",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "status": "الحالة",
+    "dateTime": "التاريخ والوقت",
+    "totalPrice": "السعر الإجمالي",
+    "customerNotesLabel": "ملاحظات لمقدم الخدمة (اختياري)",
+    "customerNotesPlaceholder": "أي طلبات خاصة أو معلومات...",
+    "notesTooLong": "لا يمكن أن تتجاوز الملاحظات 500 حرف.",
+    "confirmAndPay": "تأكيد والمتابعة للدفع",
+    "backToProvider": "العودة إلى ملف {{providerName}} الشخصي",
+    "selectServiceTitle": "اختر خدمة لدى {{providerName}}",
+    "selectServiceDescription": "اختر من الخدمات المتاحة أدناه لبدء حجزك.",
+    "noServicesAvailable": "لا توجد خدمات متاحة للحجز في هذا الوقت.",
+    "selectDateTimeTitle": "اختر التاريخ والوقت",
+    "selectDateTimeForService": "اختر تاريخًا ووقتًا لخدمة {{serviceName}}.",
+    "selectServiceFirst": "يرجى اختيار خدمة أولاً.",
+    "noSlotsAvailable": "لا توجد مواعيد متاحة للتاريخ المحدد.",
+    "selectDateToSeeTimes": "يرجى اختيار تاريخ لعرض المواعيد المتاحة.",
+    "confirmDetailsTitle": "تأكيد حجزك",
+    "confirmDetailsDescription": "يرجى مراجعة تفاصيل حجزك قبل المتابعة.",
+    "steps": {
+      "service": "اختيار الخدمة",
+      "dateTime": "اختيار التاريخ والوقت",
+      "confirm": "تأكيد التفاصيل",
+      "payment": "الدفع",
+      "booked": "تم تأكيد الحجز"
+    },
+    "payment": {
+      "title": "الدفع الآمن",
+      "description": "يرجى إدخال تفاصيل الدفع لإتمام الحجز بمبلغ {{amount}}.",
+      "cardHolderName": "اسم صاحب البطاقة",
+      "cardHolderNamePlaceholder": "محمد أحمد",
+      "cardNumber": "رقم البطاقة",
+      "expiryDate": "تاريخ انتهاء الصلاحية (MM/YY)",
+      "cvv": "CVV",
+      "invalidCard": "رقم بطاقة غير صالح (يجب أن يكون 16 رقمًا).",
+      "invalidExpiry": "تاريخ انتهاء صلاحية غير صالح (بتنسيق MM/YY).",
+      "invalidCvv": "CVV غير صالح (3 أو 4 أرقام).",
+      "nameRequired": "اسم صاحب البطاقة مطلوب.",
+      "mockNoticeTitle": "إشعار دفع وهمي",
+      "mockNoticeDescription": "هذا دفع محاكاة. لن تحدث أي معاملة حقيقية. يمكنك استخدام أي تفاصيل بطاقة وهمية.",
+      "payNowButton": "ادفع الآن"
+    },
+    "confirmed": {
+      "title": "تم تأكيد الحجز!",
+      "description": "تم تحديد موعدك بنجاح.",
+      "bookingId": "رقم الحجز: {{id}}",
+      "emailConfirmation": "تم إرسال رسالة تأكيد مع تفاصيل حجزك إلى عنوان بريدك الإلكتروني.",
+      "viewMyBookings": "عرض حجوزاتي"
+    },
+    "errors": {
+      "authRequiredTitle": "مطلوب تسجيل الدخول",
+      "authRequiredMessage": "يجب عليك تسجيل الدخول لإجراء حجز. يرجى تسجيل الدخول أو إنشاء حساب.",
+      "fetchProviderFailed": "فشل تحميل معلومات مقدم الخدمة. يرجى المحاولة مرة أخرى.",
+      "providerNotFound": "مقدم الخدمة غير موجود.",
+      "selectDateServiceFirst": "يرجى اختيار خدمة وتاريخ أولاً.",
+      "fetchSlotsFailed": "فشل تحميل المواعيد المتاحة. يرجى المحاولة مرة أخرى.",
+      "createBookingFailed": "فشل في إنشاء حجزك. يرجى المحاولة مرة أخرى.",
+      "missingInfoPayment": "معلومات الحجز ناقصة. يرجى الرجوع وإكمال جميع الخطوات.",
+      "invalidStep": "خطوة حجز غير صالحة."
+    }
   },
   "provider": {
     "about": "عن المزود",
@@ -159,7 +240,22 @@
     "deleteService": "حذف خدمة",
     "setupProfile": "إعداد الملف الشخصي",
     "updateProfile": "تحديث الملف الشخصي",
-    "viewProfile": "عرض الملف الشخصي العام"
+    "viewProfile": "عرض الملف الشخصي العام",
+    "welcomeMessage": "مرحباً، {{name}}!",
+    "notVerified": "غير موثق",
+    "todayAppointments": "مواعيد اليوم",
+    "appointmentsForToday": "{{count}} مواعيد مجدولة لهذا اليوم",
+    "noAppointmentsToday": "لا توجد مواعيد مجدولة لهذا اليوم.",
+    "freeTimeMessage": "استمتع بوقت فراغك أو استعد للحجوزات القادمة!",
+    "quickActions": "إجراءات سريعة",
+    "manageYourBusiness": "أدر عملك بكفاءة.",
+    "recentBookingsDescription": "نظرة عامة على أحدث حجوزاتك.",
+    "stats": {
+      "totalBookings": "إجمالي الحجوزات",
+      "upcomingBookings": "الحجوزات القادمة",
+      "totalRevenue": "إجمالي الإيرادات",
+      "rating": "متوسط التقييم"
+    }
   },
   "categories": {
     "hair": "الشعر",
