@@ -27,42 +27,42 @@ import { Icons } from '@/components/ui/icons';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
-// Registration form schema with validation
-const registerFormSchema = z.object({
+// Registration form schema factory
+const registerFormSchemaFactory = (t: (key: string) => string) => z.object({
   firstName: z
     .string()
-    .min(1, { message: 'validation.required' }),
+    .min(1, { message: t('auth:validation.required') }),
   lastName: z
     .string()
-    .min(1, { message: 'validation.required' }),
+    .min(1, { message: t('auth:validation.required') }),
   email: z
     .string()
-    .min(1, { message: 'validation.required' })
-    .email({ message: 'validation.email' }),
+    .min(1, { message: t('auth:validation.required') })
+    .email({ message: t('auth:validation.email') }),
   phoneNumber: z
     .string()
-    .min(1, { message: 'validation.required' })
-    .regex(/^\+?[0-9\s-()]{8,}$/, { message: 'validation.phoneNumber' }),
+    .min(1, { message: t('auth:validation.required') })
+    .regex(/^\+?[0-9\s-()]{8,}$/, { message: t('auth:validation.phoneNumber') }),
   password: z
     .string()
-    .min(8, { message: 'validation.password' }),
+    .min(8, { message: t('auth:validation.password') }),
   confirmPassword: z
     .string()
-    .min(1, { message: 'validation.required' }),
+    .min(1, { message: t('auth:validation.required') }),
   role: z
-    .enum(['customer', 'provider'], { required_error: 'validation.required' }),
+    .enum(['customer', 'provider'], { required_error: t('auth:validation.required') }),
   terms: z
     .boolean()
-    .refine((val) => val === true, { message: 'validation.termsRequired' }),
+    .refine((val) => val === true, { message: t('auth:validation.termsRequired') }),
   privacy: z
     .boolean()
-    .refine((val) => val === true, { message: 'validation.termsRequired' }),
+    .refine((val) => val === true, { message: t('auth:validation.termsRequired') }),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: 'validation.passwordMatch',
+  message: t('auth:validation.passwordMatch'),
   path: ['confirmPassword'],
 });
 
-type RegisterFormValues = z.infer<typeof registerFormSchema>;
+type RegisterFormValues = z.infer<ReturnType<typeof registerFormSchemaFactory>>;
 
 // Mock registration API function that will be intercepted by MSW
 const registerUser = async (data: RegisterFormValues) => {
@@ -87,6 +87,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
   const isRTL = i18n.language === 'ar';
+  
+  const registerFormSchema = registerFormSchemaFactory(t);
 
   // Set up form with react-hook-form and zod validation
   const form = useForm<RegisterFormValues>({
@@ -177,7 +179,7 @@ export default function RegisterPage() {
                     </FormItem>
                   </RadioGroup>
                 </FormControl>
-                <FormMessage>{(msg: { message: string }) => t(`auth:${msg.message}`)}</FormMessage>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -197,7 +199,7 @@ export default function RegisterPage() {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage>{(msg: { message: string }) => t(`auth:${msg.message}`)}</FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -215,7 +217,7 @@ export default function RegisterPage() {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage>{(msg: { message: string }) => t(`auth:${msg.message}`)}</FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -237,7 +239,7 @@ export default function RegisterPage() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage>{(msg: { message: string }) => t(`auth:${msg.message}`)}</FormMessage>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -257,7 +259,7 @@ export default function RegisterPage() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage>{(msg: { message: string }) => t(`auth:${msg.message}`)}</FormMessage>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -277,7 +279,7 @@ export default function RegisterPage() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage>{(msg: { message: string }) => t(`auth:${msg.message}`)}</FormMessage>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -296,7 +298,7 @@ export default function RegisterPage() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage>{(msg: { message: string }) => t(`auth:${msg.message}`)}</FormMessage>
+                <FormMessage />
               </FormItem>
             )}
           />
