@@ -42,7 +42,7 @@ const registerFormSchema = z.object({
   phoneNumber: z
     .string()
     .min(1, { message: 'validation.required' })
-    .regex(/^\\+?[0-9\\s-()]{8,}$/, { message: 'validation.phoneNumber' }),
+    .regex(/^\+?[0-9\s-()]{8,}$/, { message: 'validation.phoneNumber' }),
   password: z
     .string()
     .min(8, { message: 'validation.password' }),
