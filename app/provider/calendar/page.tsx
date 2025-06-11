@@ -419,4 +419,72 @@ export default function ProviderCalendarPage() {
       </Card>
 
       {/* Booking Details Modal */}
-      <Dialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen}>\n        <DialogContent className=\"sm:max-w-md\" dir={getDirection(i18n.language)}>\n          <DialogHeader>\n            <DialogTitle>{t(\'bookingDetailsTitle\', \'Booking Details\')}</DialogTitle>\n            {selectedBooking && <DialogDesc>{t(\'bookingFor\', \'Booking for {customer}\', { customer: selectedBooking.customer?.firstName || t(\'common:booking.customer\') })}</DialogDesc>}\n          </DialogHeader>\n          {selectedBooking && (\n            <div className=\"space-y-3 py-4\">\n              <p><strong>{t(\'common:booking.service\')}:</strong> {isRTL ? selectedBooking.service?.name.ar : selectedBooking.service?.name.en}</p>\n              <p><strong>{t(\'common:booking.date\')}:</strong> {format(parseISO(selectedBooking.date), 'PPP', { locale: dateLocale })}</p>\n              <p><strong>{t(\'common:booking.time\')}:</strong> {selectedBooking.startTime} - {selectedBooking.endTime}</p>\n              <p><strong>{t(\'common:booking.status\')}:</strong> <Badge variant={getBookingStatusBadgeVariant(selectedBooking.status)}>{t(`common:status.${selectedBooking.status}`)}</Badge></p>\n              <p><strong>{t(\'common:booking.price\')}:</strong> {formatPrice(selectedBooking.totalPrice, selectedBooking.currency, i18n.language)}</p>\n              \n              {selectedBooking.status === \'pending\' && (\n                <div className=\"flex gap-2 pt-4\">\n                  <Button \n                    size=\"sm\" \n                    className=\"bg-green-600 hover:bg-green-700\"\n                    onClick={() => updateBookingStatusMutation.mutate({ bookingId: selectedBooking.id, status: \'confirmed\' })}\n                    disabled={updateBookingStatusMutation.isPending}\n                  >\n                    {updateBookingStatusMutation.isPending && updateBookingStatusMutation.variables?.status === \'confirmed\' && <Loader2 className=\"mr-2 h-4 w-4 animate-spin\" />}\n                    {t(\'confirmBookingButton\', \'Confirm Booking\')}\n                  </Button>\n                  <Button \n                    size=\"sm\" \n                    variant=\"destructive\"\n                    onClick={() => updateBookingStatusMutation.mutate({ bookingId: selectedBooking.id, status: \'cancelled\' })}\n                    disabled={updateBookingStatusMutation.isPending}\n                  >\n                     {updateBookingStatusMutation.isPending && updateBookingStatusMutation.variables?.status === \'cancelled\' && <Loader2 className=\"mr-2 h-4 w-4 animate-spin\" />}\n                    {t(\'cancelBookingButton\', \'Cancel Booking\')}\n                  </Button>\n                </div>\n              )}\n              {selectedBooking.status === \'confirmed\' && (\n                 <div className=\"flex gap-2 pt-4\">\n                  <Button \n                    size=\"sm\" \n                    variant=\"outline\"\n                    onClick={() => updateBookingStatusMutation.mutate({ bookingId: selectedBooking.id, status: \'completed\' })}\n                    disabled={updateBookingStatusMutation.isPending}\n                  >\n                    {updateBookingStatusMutation.isPending && updateBookingStatusMutation.variables?.status === \'completed\' && <Loader2 className=\"mr-2 h-4 w-4 animate-spin\" />}\n                    {t(\'markAsCompletedButton\', \'Mark as Completed\')}\n                  </Button>\n                   <Button \n                    size=\"sm\" \n                    variant=\"destructive\"\n                    onClick={() => updateBookingStatusMutation.mutate({ bookingId: selectedBooking.id, status: \'cancelled\' })}\n                    disabled={updateBookingStatusMutation.isPending}\n                  >\n                     {updateBookingStatusMutation.isPending && updateBookingStatusMutation.variables?.status === \'cancelled\' && <Loader2 className=\"mr-2 h-4 w-4 animate-spin\" />}\n                    {t(\'cancelBookingButton\', \'Cancel Booking\')}\n                  </Button>\n                </div>\n              )}\n              <p className=\"text-xs text-muted-foreground pt-2\">{t(\'dragDropMockInfo\', \'Drag & drop to reschedule (mock - not functional). Click buttons to change status.\')}</p>\n            </div>\n          )}\n          <DialogFooter>\n            <DialogClose asChild><Button type=\"button\" variant=\"outline\">{t(\'common:buttons.close\', \'Close\')}</Button></DialogClose>\n          </DialogFooter>\n        </DialogContent>\n      </Dialog>\n    </div>\n  );\n}\n
+      <Dialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen}>
+        <DialogContent className="sm:max-w-md" dir={getDirection(i18n.language)}>
+          <DialogHeader>
+            <DialogTitle>{t('bookingDetailsTitle', 'Booking Details')}</DialogTitle>
+            {selectedBooking && <DialogDesc>{t('bookingFor', 'Booking for {customer}', { customer: selectedBooking.customer?.firstName || t('common:booking.customer') })}</DialogDesc>}
+          </DialogHeader>
+          {selectedBooking && (
+            <div className="space-y-3 py-4">
+              <p><strong>{t('common:booking.service')}:</strong> {isRTL ? selectedBooking.service?.name.ar : selectedBooking.service?.name.en}</p>
+              <p><strong>{t('common:booking.date')}:</strong> {format(parseISO(selectedBooking.date), 'PPP', { locale: dateLocale })}</p>
+              <p><strong>{t('common:booking.time')}:</strong> {selectedBooking.startTime} - {selectedBooking.endTime}</p>
+              <p><strong>{t('common:booking.status')}:</strong> <Badge variant={getBookingStatusBadgeVariant(selectedBooking.status)}>{t(`common:status.${selectedBooking.status}`)}</Badge></p>
+              <p><strong>{t('common:booking.price')}:</strong> {formatPrice(selectedBooking.totalPrice, selectedBooking.currency, i18n.language)}</p>
+              
+              {selectedBooking.status === 'pending' && (
+                <div className="flex gap-2 pt-4">
+                  <Button 
+                    size="sm" 
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={() => updateBookingStatusMutation.mutate({ bookingId: selectedBooking.id, status: 'confirmed' })}
+                    disabled={updateBookingStatusMutation.isPending}
+                  >
+                    {updateBookingStatusMutation.isPending && updateBookingStatusMutation.variables?.status === 'confirmed' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t('confirmBookingButton', 'Confirm Booking')}
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => updateBookingStatusMutation.mutate({ bookingId: selectedBooking.id, status: 'cancelled' })}
+                    disabled={updateBookingStatusMutation.isPending}
+                  >
+                     {updateBookingStatusMutation.isPending && updateBookingStatusMutation.variables?.status === 'cancelled' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t('cancelBookingButton', 'Cancel Booking')}
+                  </Button>
+                </div>
+              )}
+              {selectedBooking.status === 'confirmed' && (
+                 <div className="flex gap-2 pt-4">
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => updateBookingStatusMutation.mutate({ bookingId: selectedBooking.id, status: 'completed' })}
+                    disabled={updateBookingStatusMutation.isPending}
+                  >
+                    {updateBookingStatusMutation.isPending && updateBookingStatusMutation.variables?.status === 'completed' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t('markAsCompletedButton', 'Mark as Completed')}
+                  </Button>
+                   <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => updateBookingStatusMutation.mutate({ bookingId: selectedBooking.id, status: 'cancelled' })}
+                    disabled={updateBookingStatusMutation.isPending}
+                  >
+                     {updateBookingStatusMutation.isPending && updateBookingStatusMutation.variables?.status === 'cancelled' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t('cancelBookingButton', 'Cancel Booking')}
+                  </Button>
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground pt-2">{t('dragDropMockInfo', 'Drag & drop to reschedule (mock - not functional). Click buttons to change status.')}</p>
+            </div>
+          )}
+          <DialogFooter>
+            <DialogClose asChild><Button type="button" variant="outline">{t('common:buttons.close', 'Close')}</Button></DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
