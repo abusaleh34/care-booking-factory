@@ -157,13 +157,7 @@ export default function ProviderCalendarPage() {
     enabled: !!providerId,
   });
 
-  const updateBookingStatusMutation = useMutation<Booking, Error, { bookingId: string; status: Booking['status'] }>({
-    mutationFn: updateBookingStatusAPI,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['providerBookings'] });
-      setIsBookingModalOpen(false);
-    },
-  });
+  const updateBookingStatusMutation = useMutation<Booking, Error, { bookingId: string; status: Booking['status'] }>({\n    mutationFn: updateBookingStatusAPI,\n    onSuccess: () => {\n      queryClient.invalidateQueries({ queryKey: ['providerBookings'] });\n      setIsBookingModalOpen(false);\n    },\n  });
 
   const filteredBookings = useMemo(() => {
     if (!bookings) return [];
@@ -195,10 +189,10 @@ export default function ProviderCalendarPage() {
 
   const getBookingStatusBadgeVariant = (status: Booking['status']) => {
     switch (status) {
-      case 'confirmed': return 'success';
-      case 'pending': return 'warning';
+      case 'confirmed': return 'default';      // Changed from 'success'
+      case 'pending': return 'secondary';      // Changed from 'warning'
       case 'cancelled': return 'destructive';
-      case 'completed': return 'default';
+      case 'completed': return 'outline';      // Changed to differentiate from confirmed
       default: return 'outline';
     }
   };
@@ -358,8 +352,7 @@ export default function ProviderCalendarPage() {
                 <SelectItem value="">{t('allServices', 'All Services')}</SelectItem>
                 {services?.map(service => (
                   <SelectItem key={service.id} value={service.id}>{isRTL ? service.name.ar : service.name.en}</SelectItem>
-                ))}
-              </SelectContent>
+                ))}\n              </SelectContent>
             </Select>
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-full sm:w-[180px]">
